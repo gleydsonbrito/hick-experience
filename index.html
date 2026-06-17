@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiência de Reserva de Viagens</title>
+    <style>
+        body {
+            font-family: Inter, Arial, sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+            color: #222;
+        }
+
+        .header {
+            background: white;
+            padding: 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+            text-align: center;
+            font-weight: bold;
+            font-size: 22px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .08);
+        }
+
+        h1,
+        h2,
+        h3 {
+            text-align: center
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .option {
+            border: none;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+            font-size: 15px;
+        }
+
+        .option:hover {
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .progress {
+            text-align: center;
+            color: #777;
+            margin-bottom: 15px;
+        }
+
+        .result {
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .small {
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">🏡 TravelBook</div>
+
+    <div class="container">
+
+        <div id="start" class="card">
+            <h1>Missão</h1>
+            <p style="text-align:center">
+                Encontre e reserve o <b>Hotel Araucárias em Gramado para 2 pessoas</b>.
+            </p>
+
+            <p class="small">
+                Você realizará duas experiências de navegação.
+            </p>
+
+            <div style="text-align:center">
+                <button class="option" onclick="startExperiment(1)">Iniciar</button>
+            </div>
+        </div>
+
+        <div id="game" class="card hidden">
+            <div class="progress" id="progress"></div>
+            <h2 id="title"></h2>
+            <div class="grid" id="options"></div>
+        </div>
+
+        <div id="result" class="card hidden">
+            <h2>Resultados</h2>
+            <div id="resultText" class="result"></div>
+        </div>
+
+    </div>
+
+    <script>
+
+        let experiment = 1;
+        let step = 0;
+        let startTime = 0;
+        let time1 = 0;
+        let time2 = 0;
+
+        const exp1 = [
+            {
+                title: "Escolha uma Região do Brasil",
+                correct: "Sul",
+                options: ["Norte", "Nordeste", "Centro-Oeste", "Sudeste", "Sul", "Litoral Norte", "Litoral Sul", "Interior", "Fronteira", "Ilhas"]
+            },
+            {
+                title: "Escolha um Estado",
+                correct: "Rio Grande do Sul",
+                options: ["Paraná", "Santa Catarina", "Rio Grande do Sul", "São Paulo", "Minas Gerais", "Rio de Janeiro", "Bahia", "Pernambuco", "Ceará", "Goiás"]
+            },
+            {
+                title: "Escolha uma Cidade",
+                correct: "Gramado",
+                options: ["Porto Alegre", "Caxias do Sul", "Pelotas", "Santa Maria", "Gramado", "Canela", "Torres", "Novo Hamburgo", "Rio Grande", "Passo Fundo", "Bento Gonçalves", "Uruguaiana"]
+            },
+            {
+                title: "Tipo de Hospedagem",
+                correct: "Hotel",
+                options: ["Hotel", "Pousada", "Hostel", "Resort", "Flat", "Chalé", "Apartamento", "Casa"]
+            },
+            {
+                title: "Escolha um Hotel",
+                correct: "Hotel Araucárias",
+                options: ["Hotel Central", "Hotel Bosque", "Hotel Jardim", "Hotel Imperial", "Hotel Serrano", "Hotel Alpino", "Hotel Araucárias", "Hotel Gramado Sul", "Hotel Europa", "Hotel Vale Verde", "Hotel das Hortênsias", "Hotel Montanha"]
+            },
+            {
+                title: "Quantidade de Hóspedes",
+                correct: "2",
+                options: ["1", "2", "3", "4", "5", "6", "7", "8"]
+            },
+            {
+                title: "Finalizar",
+                correct: "Confirmar Reserva",
+                options: ["Confirmar Reserva"]
+            }
+        ];
+
+        const exp2 = [
+            {
+                title: "Qual região do Brasil deseja visitar?",
+                correct: "Sul",
+                options: ["Norte", "Nordeste", "Sudeste", "Sul"]
+            },
+            {
+                title: "Escolha um Estado do Sul",
+                correct: "Rio Grande do Sul",
+                options: ["Paraná", "Santa Catarina", "Rio Grande do Sul"]
+            },
+            {
+                title: "Destinos Populares",
+                correct: "Gramado",
+                options: ["Gramado", "Canela", "Bento Gonçalves", "Porto Alegre"]
+            },
+            {
+                title: "Tipo de Hospedagem",
+                correct: "Hotel",
+                options: ["Hotel", "Pousada", "Resort", "Hostel"]
+            },
+            {
+                title: "Hotéis Recomendados",
+                correct: "Hotel Araucárias",
+                options: ["Hotel Araucárias", "Hotel Bosque", "Hotel Serrano", "Hotel Jardim"]
+            },
+            {
+                title: "Quantidade de Hóspedes",
+                correct: "2",
+                options: ["1", "2", "3", "4+"]
+            },
+            {
+                title: "Finalizar",
+                correct: "Confirmar Reserva",
+                options: ["Confirmar Reserva"]
+            }
+        ];
+
+        function shuffle(arr) {
+            return [...arr].sort(() => Math.random() - 0.5);
+        }
+
+        function startExperiment(n) {
+            experiment = n;
+            step = 0;
+            document.getElementById("start").classList.add("hidden");
+            document.getElementById("game").classList.remove("hidden");
+            startTime = Date.now();
+            render();
+        }
+
+        function render() {
+
+            const data = (experiment === 1 ? exp1 : exp2)[step];
+
+            document.getElementById("progress").innerText =
+                (experiment === 1 ? "Experiência 1" : "Experiência 2") + " • Etapa " + (step + 1) + " de 7";
+
+            document.getElementById("title").innerText = data.title;
+
+            const container = document.getElementById("options");
+            container.innerHTML = "";
+
+            shuffle(data.options).forEach(op => {
+
+                const btn = document.createElement("button");
+                btn.className = "option";
+                btn.innerText = op;
+
+                btn.onclick = () => {
+
+                    if (op === data.correct) {
+                        step++;
+
+                        if (step >= 7) {
+
+                            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+
+                            if (experiment === 1) {
+                                time1 = elapsed;
+                                alert("Primeira experiência concluída.");
+                                startExperiment(2);
+                            } else {
+                                time2 = elapsed;
+                                showResult();
+                            }
+                            return;
+                        }
+
+                        render();
+
+                    } else {
+                        btn.style.opacity = ".4";
+                    }
+                };
+
+                container.appendChild(btn);
+
+            });
+
+        }
+
+        function showResult() {
+
+            document.getElementById("game").classList.add("hidden");
+            document.getElementById("result").classList.remove("hidden");
+
+            const diff = (time1 - time2).toFixed(1);
+
+            document.getElementById("resultText").innerHTML = `
+<p><strong>Experiência 1:</strong> ${time1}s</p>
+<p><strong>Experiência 2:</strong> ${time2}s</p>
+<p><strong>Diferença:</strong> ${diff}s</p>
+`;
+
+        }
+
+    </script>
+
+</body>
+
+</html>
